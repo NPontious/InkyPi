@@ -49,4 +49,32 @@ class TestPlaylist:
         playlist = Playlist("Test Playlist", start, end)
         assert playlist.is_active(current) == expected
         assert playlist.get_priority() == priority
+
+
+def test_refresh_info_remote_client_telemetry():
+    from src.model import RefreshInfo
+
+    info = RefreshInfo(
+        refresh_type="Playlist",
+        plugin_id="clock",
+        refresh_time="2026-10-05T18:00:00",
+        image_hash="abc12345",
+        remote_client_last_seen="2026-10-05T18:05:00",
+        remote_client_battery_voltage=4.12,
+        remote_client_battery_percent=94,
+        remote_client_wifi_rssi=-62
+    )
+
+    data = info.to_dict()
+    assert data["remote_client_last_seen"] == "2026-10-05T18:05:00"
+    assert data["remote_client_battery_voltage"] == 4.12
+    assert data["remote_client_battery_percent"] == 94
+    assert data["remote_client_wifi_rssi"] == -62
+
+    restored = RefreshInfo.from_dict(data)
+    assert restored.remote_client_last_seen == "2026-10-05T18:05:00"
+    assert restored.remote_client_battery_voltage == 4.12
+    assert restored.remote_client_battery_percent == 94
+    assert restored.remote_client_wifi_rssi == -62
+
         

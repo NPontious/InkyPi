@@ -17,7 +17,22 @@ class RefreshInfo:
         plugin_instance (str): Plugin instance name if refresh_type is 'Playlist'.
     """
 
-    def __init__(self, refresh_type, plugin_id, refresh_time, image_hash, playlist=None, plugin_instance=None):
+    def __init__(
+        self,
+        refresh_type=None,
+        plugin_id=None,
+        refresh_time=None,
+        image_hash=None,
+        playlist=None,
+        plugin_instance=None,
+        duration_seconds=None,
+        plugin_processing_duration_seconds=None,
+        display_refresh_duration_seconds=None,
+        remote_client_last_seen=None,
+        remote_client_battery_voltage=None,
+        remote_client_battery_percent=None,
+        remote_client_wifi_rssi=None,
+    ):
         """Initialize RefreshInfo instance."""
         self.refresh_time = refresh_time
         self.image_hash = image_hash
@@ -25,6 +40,13 @@ class RefreshInfo:
         self.plugin_id = plugin_id
         self.playlist = playlist
         self.plugin_instance = plugin_instance
+        self.duration_seconds = duration_seconds
+        self.plugin_processing_duration_seconds = plugin_processing_duration_seconds
+        self.display_refresh_duration_seconds = display_refresh_duration_seconds
+        self.remote_client_last_seen = remote_client_last_seen
+        self.remote_client_battery_voltage = remote_client_battery_voltage
+        self.remote_client_battery_percent = remote_client_battery_percent
+        self.remote_client_wifi_rssi = remote_client_wifi_rssi
 
     def get_refresh_datetime(self):
         """Returns the refresh time as a datetime object or None if not set."""
@@ -44,17 +66,40 @@ class RefreshInfo:
             refresh_dict["playlist"] = self.playlist
         if self.plugin_instance:
             refresh_dict["plugin_instance"] = self.plugin_instance
+        if self.duration_seconds is not None:
+            refresh_dict["duration_seconds"] = self.duration_seconds
+        if self.plugin_processing_duration_seconds is not None:
+            refresh_dict["plugin_processing_duration_seconds"] = self.plugin_processing_duration_seconds
+        if self.display_refresh_duration_seconds is not None:
+            refresh_dict["display_refresh_duration_seconds"] = self.display_refresh_duration_seconds
+        if self.remote_client_last_seen is not None:
+            refresh_dict["remote_client_last_seen"] = self.remote_client_last_seen
+        if self.remote_client_battery_voltage is not None:
+            refresh_dict["remote_client_battery_voltage"] = self.remote_client_battery_voltage
+        if self.remote_client_battery_percent is not None:
+            refresh_dict["remote_client_battery_percent"] = self.remote_client_battery_percent
+        if self.remote_client_wifi_rssi is not None:
+            refresh_dict["remote_client_wifi_rssi"] = self.remote_client_wifi_rssi
         return refresh_dict
 
     @classmethod
     def from_dict(cls, data):
+        if not data:
+            return cls()
         return cls(
             refresh_time=data.get("refresh_time"),
             image_hash=data.get("image_hash"),
             refresh_type=data.get("refresh_type"),
             plugin_id=data.get("plugin_id"),
             playlist=data.get("playlist"),
-            plugin_instance=data.get("plugin_instance")
+            plugin_instance=data.get("plugin_instance"),
+            duration_seconds=data.get("duration_seconds"),
+            plugin_processing_duration_seconds=data.get("plugin_processing_duration_seconds"),
+            display_refresh_duration_seconds=data.get("display_refresh_duration_seconds"),
+            remote_client_last_seen=data.get("remote_client_last_seen"),
+            remote_client_battery_voltage=data.get("remote_client_battery_voltage"),
+            remote_client_battery_percent=data.get("remote_client_battery_percent"),
+            remote_client_wifi_rssi=data.get("remote_client_wifi_rssi"),
         )
 
 class PlaylistManager:
