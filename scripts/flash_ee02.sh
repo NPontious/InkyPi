@@ -30,16 +30,16 @@ else
 fi
 
 echo "Flashing firmware to $PORT..."
-if command -v esptool.py >/dev/null 2>&1; then
-    ESPTOOL_CMD="esptool.py"
+if command -v esptool >/dev/null 2>&1; then
+    esptool --chip esp32s3 --port "$PORT" --baud "$BAUD" write_flash 0x0 "$FW_DIR/$FW_NAME"
+elif command -v esptool.py >/dev/null 2>&1; then
+    esptool.py --chip esp32s3 --port "$PORT" --baud "$BAUD" write_flash 0x0 "$FW_DIR/$FW_NAME"
 elif python3 -m esptool --help >/dev/null 2>&1; then
-    ESPTOOL_CMD="python3 -m esptool"
+    python3 -m esptool --chip esp32s3 --port "$PORT" --baud "$BAUD" write_flash 0x0 "$FW_DIR/$FW_NAME"
 else
     echo "esptool not found in current environment, invoking via nix-shell..."
-    ESPTOOL_CMD="nix-shell -p python3Packages.esptool --run esptool.py"
+    nix-shell -p esptool --run "esptool --chip esp32s3 --port \"$PORT\" --baud \"$BAUD\" write_flash 0x0 \"$FW_DIR/$FW_NAME\""
 fi
-
-$ESPTOOL_CMD --chip esp32s3 --port "$PORT" --baud "$BAUD" write_flash 0x0 "$FW_DIR/$FW_NAME"
 
 echo "=========================================================="
 echo "  Flashing complete!"
