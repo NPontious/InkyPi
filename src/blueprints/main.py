@@ -7,7 +7,7 @@ main_bp = Blueprint("main", __name__)
 @main_bp.route('/')
 def main_page():
     device_config = current_app.config['DEVICE_CONFIG']
-    return render_template('inky.html', config=device_config.get_config(), plugins=device_config.get_plugins())
+    return render_template('inky.html', config=device_config.get_config(), plugins=device_config.get_plugins(), device_config=device_config)
 
 @main_bp.route('/api/current_image')
 def get_current_image():
@@ -56,3 +56,29 @@ def save_plugin_order():
     device_config.set_plugin_order(order)
 
     return jsonify({"success": True})
+
+
+@main_bp.route('/api/status')
+def get_status():
+    """Returns the current status of InkyPi including remote client telemetry."""
+    device_config = current_app.config['DEVICE_CONFIG']
+
+    refresh_info = device_config.get_refresh_info().to_dict()
+    playlist_manager = device_config.get_playlist_manager() if hasattr(device_config, 'get_playlist_manager') else None
+
+    status = {
+        "device_name": device_config.get_config("name", "InkyPi"),
+        "active_playlist": playlist_manager.active_playlist if playlist_manager else None,
+        "last_refresh_time": refresh_info.get("refresh_time"),
+        "last_plugin_id": refresh_info.get("plugin_id"),
+        "last_plugin_instance": refresh_info.get("plugin_instance"),
+        "refresh_type": refresh_info.get("refresh_type"),
+        "remote_client": {
+            "last_seen": refresh_info.get("remote_client_last_seen"),
+            "battery_voltage": refresh_info.get("remote_client_battery_voltage"),
+            "battery_percent": refresh_info.get("remote_client_battery_percent"),
+            "wifi_rssi": refresh_info.get("remote_client_wifi_rssi")
+        }
+    }
+
+    return jsonify(status)

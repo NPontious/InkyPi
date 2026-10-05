@@ -130,6 +130,18 @@
                            required 
                            class="form-input">
                 </div>
+                <!-- Display Type Dropdown -->
+                <div class="form-group">
+                    <label for="display_type" class="form-label">Display Model / Mode:</label>
+                    <select id="display_type" name="display_type" class="form-input" onchange="document.getElementById('photoframe-help').style.display = this.value === 'photoframe' ? 'block' : 'none';">
+                        <option value="photoframe" {% if device_settings.get('display_type') == 'photoframe' %}selected{% endif %}>Remote PhotoFrame (Wi-Fi ESP32 - 13.3" Spectra 6)</option>
+                        <option value="mock" {% if device_settings.get('display_type') == 'mock' %}selected{% endif %}>Mock Display (Development / Testing)</option>
+                        <option value="inky" {% if device_settings.get('display_type', 'inky') == 'inky' %}selected{% endif %}>Inky Impression (Local Pi HAT)</option>
+                    </select>
+                    <div id="photoframe-help" class="alert alert-info mt-2" style="{% if device_settings.get('display_type') != 'photoframe' %}display:none;{% endif %} padding: 8px 12px; margin-top: 8px; border-radius: 4px; background: rgba(0, 150, 255, 0.1); border: 1px solid rgba(0, 150, 255, 0.3);">
+                        <small><strong>ESP32 Image Server URL:</strong> <code>http://&lt;server-ip&gt;:{{ request.host.split(':')[1] if ':' in request.host else '80' }}/api/photoframe/image</code></small>
+                    </div>
+                </div>
                 <div class="form-group nowrap">
                     <!-- Orientation Dropdown -->
                     <div class="form-group">

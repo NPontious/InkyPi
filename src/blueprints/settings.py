@@ -69,6 +69,10 @@ def save_settings():
         }
         if "inky_saturation" in form_data:
             settings["image_settings"]["inky_saturation"] = float(form_data.get("inky_saturation", "0.5"))
+        if "display_type" in form_data:
+            settings["display_type"] = form_data["display_type"]
+            if form_data["display_type"] == "photoframe" and device_config.get_config("display_type") != "photoframe":
+                settings["resolution"] = [1600, 1200]
         device_config.update_config(settings)
 
         if plugin_cycle_interval_seconds != previous_interval_seconds:

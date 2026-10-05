@@ -77,6 +77,14 @@
         <div class="image-container">
             <img src="{{ url_for('static', filename='images/current_image.png') }}" alt="Current Image">
         </div>
+        {% set refresh_info = device_config.get_refresh_info() if device_config else None %}
+        {% if refresh_info and refresh_info.remote_client_battery_percent is not none %}
+        <div class="remote-client-badge" style="text-align: center; margin-top: 8px; font-size: 0.85rem; color: #888;">
+            🔋 ESP32 Battery: <strong>{{ refresh_info.remote_client_battery_percent }}%</strong>
+            {% if refresh_info.remote_client_battery_voltage %}({{ refresh_info.remote_client_battery_voltage }}V){% endif %}
+            {% if refresh_info.remote_client_wifi_rssi %}| 📶 Wi-Fi: <strong>{{ refresh_info.remote_client_wifi_rssi }} dBm</strong>{% endif %}
+        </div>
+        {% endif %}
 
         <!-- Separator -->
         <div class="separator"></div>

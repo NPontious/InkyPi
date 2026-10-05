@@ -3,6 +3,7 @@ import pytest
 from PIL import Image
 from flask import Flask
 from blueprints.photoframe import photoframe_bp
+from blueprints.main import main_bp
 from model import RefreshInfo
 
 class MockConfig:
@@ -25,6 +26,9 @@ class MockConfig:
     def get_config(self, key, default=None):
         return "InkyPi Test" if key == "name" else default
 
+    def get_playlist_manager(self):
+        return None
+
 @pytest.fixture
 def client(tmp_path):
     app = Flask(__name__)
@@ -36,6 +40,7 @@ def client(tmp_path):
 
     app.config["DEVICE_CONFIG"] = config
     app.register_blueprint(photoframe_bp)
+    app.register_blueprint(main_bp)
     with app.test_client() as c:
         yield c, config
 
@@ -90,3 +95,18 @@ def test_photoframe_status_endpoint(client):
     data = res.get_json()
     assert data["image_hash"] == "hash-12345"
     assert "remote_client" in data
+
+
+def test_main_status_endpoint(client):
+    c, config = client
+    # Send telemetry first
+    c.get("/api/photoframe/image?battery=4.05&percent=88&rssi=-60")
+
+    res = c.get("/api/status")
+    assert res.status_code == 200
+    data = res.get_json()
+    assert data["device_name"] == "InkyPi Test"
+    assert data["remote_client"]["battery_percent"] == 88
+    assert data["remote_client"]["battery_voltage"] == 4.05
+    assert data["remote_client"]["wifi_rssi"] == -60
+
