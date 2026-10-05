@@ -3,7 +3,10 @@
 # set up logging
 import os, logging.config
 
-from pi_heif import register_heif_opener
+try:
+    from pi_heif import register_heif_opener
+except ImportError:
+    register_heif_opener = None
 
 logging.config.fileConfig(os.path.join(os.path.dirname(__file__), 'config', 'logging.conf'))
 
@@ -84,7 +87,8 @@ app.register_blueprint(apikeys_bp)
 app.register_blueprint(photoframe_bp)
 
 # Register opener for HEIF/HEIC images
-register_heif_opener()
+if register_heif_opener:
+    register_heif_opener()
 
 if __name__ == '__main__':
 
