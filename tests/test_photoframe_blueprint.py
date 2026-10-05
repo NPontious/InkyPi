@@ -80,6 +80,14 @@ def test_telemetry_ingestion_via_headers(client):
     assert config.refresh_info.remote_client_last_seen is not None
     assert config.written is True
 
+    # Test X-Battery-Percentage variant
+    res2 = c.get(
+        "/api/photoframe/image",
+        headers={"X-Battery-Percentage": "87"},
+    )
+    assert res2.status_code == 200
+    assert config.refresh_info.remote_client_battery_percent == 87
+
 def test_telemetry_ingestion_via_query_params(client):
     c, config = client
     res = c.get("/api/photoframe/image?battery=3.85&percent=65&rssi=-72")

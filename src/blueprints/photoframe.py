@@ -21,8 +21,13 @@ def _parse_int(val):
 
 def _update_telemetry(device_config):
     """Parses telemetry from headers or query parameters and updates device_config."""
-    voltage = _parse_float(request.headers.get("X-Battery-Voltage") or request.args.get("battery"))
-    percent = _parse_int(request.headers.get("X-Battery-Percent") or request.args.get("percent"))
+    voltage = _parse_float(request.headers.get("X-Battery-Voltage") or request.args.get("battery") or request.args.get("battery_voltage"))
+    percent = _parse_int(
+        request.headers.get("X-Battery-Percentage")
+        or request.headers.get("X-Battery-Percent")
+        or request.args.get("percent")
+        or request.args.get("battery_level")
+    )
     rssi = _parse_int(request.headers.get("X-WiFi-RSSI") or request.args.get("rssi"))
 
     now_iso = datetime.now(timezone.utc).isoformat()
