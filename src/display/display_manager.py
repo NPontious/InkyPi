@@ -4,6 +4,10 @@ import logging
 
 from utils.image_utils import resize_image, change_orientation, apply_image_enhancement
 from display.mock_display import MockDisplay
+try:
+    from display.photoframe_display import PhotoframeDisplay
+except ImportError:
+    from .photoframe_display import PhotoframeDisplay
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +45,8 @@ class DisplayManager:
 
         if display_type == "mock":
             self.display = MockDisplay(device_config)
+        elif display_type == "photoframe":
+            self.display = PhotoframeDisplay(device_config)
         elif display_type == "inky":
             self.display = InkyDisplay(device_config)
         elif fnmatch.fnmatch(display_type, "epd*in*"):  
