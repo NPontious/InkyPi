@@ -22,11 +22,18 @@ class PhotoframeDisplay(AbstractDisplay):
 
     def display_image(self, image, image_settings=[]):
         """
-        Saves the processed image to the configured current_image_file path.
+        Saves the processed image to the configured current_image_file path atomically.
 
         Args:
             image (PIL.Image): The final processed image.
             image_settings (list, optional): Optional image adjustments.
         """
-        logger.info(f"PhotoframeDisplay: Writing image to {self.device_config.current_image_file}")
-        image.save(self.device_config.current_image_file, format="PNG")
+        output_path = self.device_config.current_image_file
+        output_dir = os.path.dirname(output_path)
+        if output_dir and not os.path.exists(output_dir):
+            os.makedirs(output_dir, exist_ok=True)
+        logger.info(f"PhotoframeDisplay: Writing image atomically to {output_path}")
+        tmp_path = output_path + f".tmp.{os.getpid()}"
+        image.save(tmp_path, format="PNG")
+        os.replace(tmp_path, output_path)
+

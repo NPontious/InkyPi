@@ -75,9 +75,14 @@ def get_photoframe_image():
     image_path = device_config.current_image_file
     if not os.path.exists(image_path):
         logger.warning(f"Current image not found at {image_path}, generating fallback")
+        parent_dir = os.path.dirname(image_path)
+        if parent_dir:
+            os.makedirs(parent_dir, exist_ok=True)
         from PIL import Image
         img = Image.new("RGB", (1600, 1200), color=(255, 255, 255))
-        img.save(image_path, format="PNG")
+        tmp_path = image_path + f".tmp.{os.getpid()}"
+        img.save(tmp_path, format="PNG")
+        os.replace(tmp_path, image_path)
 
     resp = send_file(image_path, mimetype="image/png")
     resp.headers["ETag"] = quoted_hash

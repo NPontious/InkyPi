@@ -76,9 +76,10 @@ class DisplayManager:
         if not hasattr(self, "display"):
             raise ValueError("No valid display instance initialized.")
         
-        # Save the image
-        logger.info(f"Saving image to {self.device_config.current_image_file}")
-        image.save(self.device_config.current_image_file)
+        # Save the image (for local displays; PhotoframeDisplay saves the transformed image directly)
+        if not isinstance(self.display, PhotoframeDisplay):
+            logger.info(f"Saving image to {self.device_config.current_image_file}")
+            image.save(self.device_config.current_image_file)
 
         # Resize and adjust orientation
         image = change_orientation(image, self.device_config.get_config("orientation"))

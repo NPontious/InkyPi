@@ -110,3 +110,19 @@ def test_main_status_endpoint(client):
     assert data["remote_client"]["battery_voltage"] == 4.05
     assert data["remote_client"]["wifi_rssi"] == -60
 
+
+def test_photoframe_fallback_image_creates_missing_directory(tmp_path):
+    app = Flask(__name__)
+    config = MockConfig(tmp_path)
+    # Set image path in a deeply nested non-existent directory
+    config.current_image_file = str(tmp_path / "deeply" / "nested" / "dir" / "current_image.png")
+    app.config["DEVICE_CONFIG"] = config
+    app.register_blueprint(photoframe_bp)
+
+    with app.test_client() as c:
+        res = c.get("/api/photoframe/image")
+        assert res.status_code == 200
+        assert os.path.exists(config.current_image_file)
+
+
+

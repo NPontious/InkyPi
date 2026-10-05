@@ -12,7 +12,7 @@ class DummyConfig:
             "resolution": [1600, 1200],
             "orientation": "horizontal",
             "inverted_image": False,
-            "image_settings": []
+            "image_settings": {}
         }
 
     def get_config(self, key, default=None):
@@ -37,3 +37,17 @@ def test_display_manager_initializes_photoframe(tmp_path):
     conf = DummyConfig(tmp_path)
     dm = DisplayManager(conf)
     assert isinstance(dm.display, PhotoframeDisplay)
+
+
+def test_display_manager_photoframe_transformed_and_atomic(tmp_path):
+    conf = DummyConfig(tmp_path)
+    conf.config["orientation"] = "vertical"
+    conf.config["resolution"] = [1200, 1600]
+    dm = DisplayManager(conf)
+
+    raw_img = Image.new("RGB", (800, 600), color=(0, 255, 0))
+    dm.display_image(raw_img)
+
+    saved_img = Image.open(conf.current_image_file)
+    assert saved_img.size == (1200, 1600)
+
