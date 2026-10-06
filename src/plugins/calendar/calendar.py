@@ -75,6 +75,11 @@ class Calendar(BasePlugin):
         if not calendar_urls:
             return parsed_events
 
+        # Filter out empty or unexpanded env var placeholders
+        calendar_urls = [u for u in calendar_urls if u and isinstance(u, str) and not u.startswith("$")]
+        if not calendar_urls:
+            return parsed_events
+
         default_palette = ["#3b82f6", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6", "#06b6d4", "#ec4899", "#14b8a6"]
         if not colors:
             colors = [default_palette[i % len(default_palette)] for i in range(len(calendar_urls))]

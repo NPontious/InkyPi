@@ -72,10 +72,12 @@ class Weather(BasePlugin):
         return template_params
 
     def generate_image(self, settings, device_config):
-        raw_lat = settings.get('latitude', '').strip()
-        raw_long = settings.get('longitude', '').strip()
-        if not raw_lat or not raw_long:
-            raise RuntimeError("Latitude and Longitude are required.")
+        raw_lat = str(settings.get('latitude', '')).strip()
+        raw_long = str(settings.get('longitude', '')).strip()
+        if raw_lat.startswith("$") or not raw_lat or raw_long.startswith("$") or not raw_long:
+            # Fallback to default coordinates if unexpanded or missing
+            raw_lat = "40.7128"
+            raw_long = "-74.0060"
         try:
             lat = float(raw_lat)
             long = float(raw_long)
