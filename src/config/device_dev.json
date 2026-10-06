@@ -1,6 +1,7 @@
 {
     "name": "InkyPi Development",
     "display_type": "photoframe",
+    "remote_client_ip": "10.218.170.123",
     "resolution": [
         1600,
         1200
@@ -41,9 +42,11 @@
         "active_playlist": null
     },
     "refresh_info": {
-        "refresh_time": null,
-        "image_hash": null,
-        "refresh_type": null,
-        "plugin_id": null
+        "refresh_time": "2026-10-05T23:46:09.663028+00:00",
+        "image_hash": "4464eefc6dcf0aee0410c7e4a2697416bfb5b6df2197be2233880740cb1211da",
+        "refresh_type": "Manual Update",
+        "plugin_id": "comic",
+        "remote_client_last_seen": "2026-10-06T00:00:01.618483+00:00",
+        "remote_client_battery_percent": 100
     }
 }

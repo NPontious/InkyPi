@@ -1,5 +1,6 @@
 import os
 import logging
+import threading
 try:
     from display.abstract_display import AbstractDisplay
 except ImportError:
@@ -23,6 +24,7 @@ class PhotoframeDisplay(AbstractDisplay):
     def display_image(self, image, image_settings=[]):
         """
         Saves the processed image to the configured current_image_file path atomically.
+        Also automatically sends a background push notification to the remote client if reachable.
 
         Args:
             image (PIL.Image): The final processed image.
@@ -36,4 +38,27 @@ class PhotoframeDisplay(AbstractDisplay):
         tmp_path = output_path + f".tmp.{os.getpid()}"
         image.save(tmp_path, format="PNG")
         os.replace(tmp_path, output_path)
+
+        # Trigger background push notification to remote client if known
+        client_ip = None
+        if hasattr(self.device_config, "get_refresh_info"):
+            refresh_info = self.device_config.get_refresh_info()
+            client_ip = getattr(refresh_info, "remote_client_ip", None)
+        if not client_ip and hasattr(self.device_config, "get_config"):
+            client_ip = self.device_config.get_config("remote_client_ip")
+
+        if client_ip:
+            self._notify_remote_client(client_ip)
+
+    def _notify_remote_client(self, client_ip):
+        def _send():
+            try:
+                import requests
+                logger.info(f"PhotoframeDisplay: Triggering automatic refresh on client http://{client_ip}/api/rotate")
+                requests.post(f"http://{client_ip}/api/rotate", timeout=5)
+            except Exception as e:
+                logger.debug(f"PhotoframeDisplay: Remote client notification to {client_ip} skipped/failed: {e}")
+
+        threading.Thread(target=_send, daemon=True).start()
+
 

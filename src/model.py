@@ -32,6 +32,7 @@ class RefreshInfo:
         remote_client_battery_voltage=None,
         remote_client_battery_percent=None,
         remote_client_wifi_rssi=None,
+        remote_client_ip=None,
     ):
         """Initialize RefreshInfo instance."""
         self.refresh_time = refresh_time
@@ -47,6 +48,7 @@ class RefreshInfo:
         self.remote_client_battery_voltage = remote_client_battery_voltage
         self.remote_client_battery_percent = remote_client_battery_percent
         self.remote_client_wifi_rssi = remote_client_wifi_rssi
+        self.remote_client_ip = remote_client_ip
 
     def get_refresh_datetime(self):
         """Returns the refresh time as a datetime object or None if not set."""
@@ -80,6 +82,8 @@ class RefreshInfo:
             refresh_dict["remote_client_battery_percent"] = self.remote_client_battery_percent
         if self.remote_client_wifi_rssi is not None:
             refresh_dict["remote_client_wifi_rssi"] = self.remote_client_wifi_rssi
+        if self.remote_client_ip is not None:
+            refresh_dict["remote_client_ip"] = self.remote_client_ip
         return refresh_dict
 
     @classmethod
@@ -100,6 +104,7 @@ class RefreshInfo:
             remote_client_battery_voltage=data.get("remote_client_battery_voltage"),
             remote_client_battery_percent=data.get("remote_client_battery_percent"),
             remote_client_wifi_rssi=data.get("remote_client_wifi_rssi"),
+            remote_client_ip=data.get("remote_client_ip"),
         )
 
 class PlaylistManager:

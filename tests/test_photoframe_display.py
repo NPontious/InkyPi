@@ -51,3 +51,26 @@ def test_display_manager_photoframe_transformed_and_atomic(tmp_path):
     saved_img = Image.open(conf.current_image_file)
     assert saved_img.size == (1200, 1600)
 
+
+def test_photoframe_display_notifies_remote_client(tmp_path, monkeypatch):
+    conf = DummyConfig(tmp_path)
+    conf.config["remote_client_ip"] = "10.0.0.99"
+    disp = PhotoframeDisplay(conf)
+
+    called = []
+    def mock_post(url, timeout=None):
+        called.append((url, timeout))
+    monkeypatch.setattr("requests.post", mock_post)
+
+    img = Image.new("RGB", (1600, 1200), color=(10, 20, 30))
+    disp.display_image(img)
+
+    # Wait briefly for daemon thread to execute
+    import time
+    time.sleep(0.1)
+
+    assert len(called) == 1
+    assert called[0][0] == "http://10.0.0.99/api/rotate"
+    assert called[0][1] == 5
+
+
