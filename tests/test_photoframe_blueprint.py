@@ -16,6 +16,7 @@ class MockConfig:
             plugin_id="clock"
         )
         self.written = False
+        self.config = {}
 
     def get_refresh_info(self):
         return self.refresh_info
@@ -23,7 +24,12 @@ class MockConfig:
     def write_config(self):
         self.written = True
 
+    def update_value(self, key, value, write=False):
+        self.config[key] = value
+
     def get_config(self, key, default=None):
+        if key in self.config:
+            return self.config[key]
         return "InkyPi Test" if key == "name" else default
 
     def get_playlist_manager(self):
@@ -95,6 +101,18 @@ def test_telemetry_ingestion_via_query_params(client):
     assert config.refresh_info.remote_client_battery_voltage == 3.85
     assert config.refresh_info.remote_client_battery_percent == 65
     assert config.refresh_info.remote_client_wifi_rssi == -72
+
+def test_telemetry_ignores_x_forwarded_for_and_uses_remote_addr(client):
+    c, config = client
+    # Attempt SSRF injection via X-Forwarded-For
+    res = c.get(
+        "/api/photoframe/image",
+        headers={"X-Forwarded-For": "10.0.0.99"},
+        environ_base={"REMOTE_ADDR": "192.168.101.65"},
+    )
+    assert res.status_code == 200
+    assert config.refresh_info.remote_client_ip == "192.168.101.65"
+    assert config.config.get("remote_client_ip") == "192.168.101.65"
 
 def test_photoframe_status_endpoint(client):
     c, config = client

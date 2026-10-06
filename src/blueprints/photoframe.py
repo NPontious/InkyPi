@@ -47,12 +47,13 @@ def _update_telemetry(device_config):
         refresh_info.remote_client_wifi_rssi = rssi
         updated = True
 
-    raw_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
-    if raw_ip:
-        client_ip = raw_ip.split(",")[0].strip()
+    client_ip = request.remote_addr
+    if client_ip:
+        client_ip = client_ip.split(",")[0].strip()
         if client_ip and client_ip != "127.0.0.1":
             refresh_info.remote_client_ip = client_ip
-            device_config.update_value("remote_client_ip", client_ip)
+            if hasattr(device_config, "update_value"):
+                device_config.update_value("remote_client_ip", client_ip)
             updated = True
 
     if updated:
