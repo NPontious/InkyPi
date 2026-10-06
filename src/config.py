@@ -12,6 +12,7 @@ class Config:
 
     # File paths relative to the script's directory
     config_file = os.path.join(BASE_DIR, "config", "device.json")
+    state_dir = BASE_DIR
 
     # File path for storing the current image being displayed
     current_image_file = os.path.join(BASE_DIR, "static", "images", "current_image.png")
@@ -19,7 +20,33 @@ class Config:
     # Directory path for storing plugin instance images
     plugin_image_dir = os.path.join(BASE_DIR, "static", "images", "plugins")
 
-    def __init__(self):
+    declarative_mode = False
+
+    def __init__(self, config_file=None, state_dir=None, declarative_mode=None):
+        if config_file is not None:
+            self.config_file = config_file
+        elif os.getenv("INKYPI_CONFIG"):
+            self.config_file = os.getenv("INKYPI_CONFIG")
+
+        if state_dir is not None:
+            self.state_dir = state_dir
+        elif os.getenv("INKYPI_STATE_DIR"):
+            self.state_dir = os.getenv("INKYPI_STATE_DIR")
+
+        if declarative_mode is not None:
+            self.declarative_mode = declarative_mode
+        elif os.getenv("INKYPI_DECLARATIVE"):
+            self.declarative_mode = os.getenv("INKYPI_DECLARATIVE").lower() in ("1", "true", "yes")
+
+        # Resolve image paths relative to state_dir
+        if self.state_dir != self.BASE_DIR:
+            self.current_image_file = os.path.join(self.state_dir, "images", "current_image.png")
+            self.plugin_image_dir = os.path.join(self.state_dir, "images", "plugins")
+
+        # Ensure state directories exist
+        os.makedirs(os.path.dirname(self.current_image_file), exist_ok=True)
+        os.makedirs(self.plugin_image_dir, exist_ok=True)
+
         self.config = self.read_config()
         self.plugins_list = self.read_plugins_list()
         self.playlist_manager = self.load_playlist_manager()
@@ -54,6 +81,10 @@ class Config:
 
     def write_config(self):
         """Updates the cached config from the model objects and writes to the config file."""
+        if self.declarative_mode:
+            logger.debug("Declarative mode active: skipping disk write to config_file")
+            return
+
         logger.debug(f"Writing device config to {self.config_file}")
         self.update_value("playlist_config", self.playlist_manager.to_dict())
         self.update_value("refresh_info", self.refresh_info.to_dict())
@@ -113,7 +144,10 @@ class Config:
             self.write_config()
 
     def load_env_key(self, key):
-        """Loads an environment variable using dotenv and returns its value."""
+        """Loads an environment variable using os.environ first, falling back to dotenv."""
+        val = os.getenv(key)
+        if val is not None:
+            return val
         load_dotenv(override=True)
         return os.getenv(key)
 

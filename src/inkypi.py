@@ -46,6 +46,9 @@ parser = argparse.ArgumentParser(description='InkyPi Display Server')
 parser.add_argument('--dev', action='store_true', help='Run in development mode')
 parser.add_argument('--port', type=int, default=None, help='Port to bind to')
 parser.add_argument('--host', type=str, default='0.0.0.0', help='Host to bind to')
+parser.add_argument('--config-file', type=str, default=None, help='Path to configuration JSON file')
+parser.add_argument('--state-dir', type=str, default=None, help='Directory for runtime state and images')
+parser.add_argument('--declarative', action='store_true', help='Run in declarative read-only configuration mode')
 args = parser.parse_args()
 
 default_port = 8080 if args.dev else 80
@@ -54,8 +57,18 @@ PORT = args.port if args.port is not None else env_port
 HOST = args.host
 
 # Set development mode settings
-if args.dev:
+if args.config_file:
+    Config.config_file = args.config_file
+elif args.dev:
     Config.config_file = os.path.join(Config.BASE_DIR, "config", "device_dev.json")
+
+if args.state_dir:
+    Config.state_dir = args.state_dir
+
+if args.declarative:
+    Config.declarative_mode = True
+
+if args.dev:
     DEV_MODE = True
     logger.info(f"Starting InkyPi in DEVELOPMENT mode on port {PORT}")
 else:
