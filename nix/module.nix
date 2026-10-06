@@ -83,6 +83,13 @@ in
       description = "Extra Python packages to make available for community plugins.";
     };
 
+    chromiumPackage = lib.mkOption {
+      type = lib.types.nullOr lib.types.package;
+      default = pkgs.chromium;
+      description = "Chromium package for rendering HTML-based plugins (e.g. calendar, weather).";
+    };
+
+
     settings = lib.mkOption {
       type = lib.types.attrsOf lib.types.anything;
       default = { };
@@ -114,6 +121,8 @@ in
       environment = {
         PYTHONPATH = "${cfg.package}/lib/inkypi";
       };
+
+      path = lib.optional (cfg.chromiumPackage != null) cfg.chromiumPackage;
 
       serviceConfig = {
         Type = "simple";
