@@ -35,7 +35,7 @@ from blueprints.playlist import playlist_bp
 from blueprints.apikeys import apikeys_bp
 from blueprints.photoframe import photoframe_bp
 from jinja2 import ChoiceLoader, FileSystemLoader
-from plugins.plugin_registry import load_plugins, register_plugin_blueprints
+from plugins.plugin_registry import load_plugins, register_plugin_blueprints, get_plugin_search_paths
 from waitress import serve
 
 
@@ -82,8 +82,7 @@ logging.getLogger('waitress.queue').setLevel(logging.ERROR)
 app = Flask(__name__)
 template_dirs = [
    os.path.join(os.path.dirname(__file__), "templates"),    # Default template folder
-   os.path.join(os.path.dirname(__file__), "plugins"),      # Plugin templates
-]
+] + [str(p) for p in get_plugin_search_paths() if p.is_dir()]
 app.jinja_loader = ChoiceLoader([FileSystemLoader(directory) for directory in template_dirs])
 
 device_config = Config()

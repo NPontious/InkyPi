@@ -63,19 +63,29 @@ class Config:
         return config
 
     def read_plugins_list(self):
-        """Reads the plugin-info.json config JSON from each plugin folder. Excludes the base plugin."""
-        # Iterate over all plugin folders
+        """Reads the plugin-info.json config JSON from each plugin folder across search paths."""
+        from plugins.plugin_registry import get_plugin_search_paths
         plugins_list = []
-        for plugin in sorted(os.listdir(os.path.join(self.BASE_DIR, "plugins"))):
-            plugin_path = os.path.join(self.BASE_DIR, "plugins", plugin)
-            if os.path.isdir(plugin_path) and plugin != "__pycache__":
-                # Check if the plugin-info.json file exists
-                plugin_info_file = os.path.join(plugin_path, "plugin-info.json")
-                if os.path.isfile(plugin_info_file):
-                    logger.debug(f"Reading plugin info from {plugin_info_file}")
-                    with open(plugin_info_file) as f:
-                        plugin_info = json.load(f)
-                    plugins_list.append(plugin_info)
+        seen_ids = set()
+
+        for base_path in get_plugin_search_paths():
+            if not base_path.is_dir():
+                continue
+            for plugin in sorted(os.listdir(str(base_path))):
+                plugin_path = base_path / plugin
+                if plugin_path.is_dir() and plugin != "__pycache__":
+                    plugin_info_file = plugin_path / "plugin-info.json"
+                    if plugin_info_file.is_file():
+                        logger.debug(f"Reading plugin info from {plugin_info_file}")
+                        try:
+                            with open(plugin_info_file) as f:
+                                plugin_info = json.load(f)
+                            plugin_id = plugin_info.get("id")
+                            if plugin_id and plugin_id not in seen_ids:
+                                seen_ids.add(plugin_id)
+                                plugins_list.append(plugin_info)
+                        except Exception as e:
+                            logger.error(f"Failed to read {plugin_info_file}: {e}")
 
         return plugins_list
 

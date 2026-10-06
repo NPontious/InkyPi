@@ -71,31 +71,25 @@ def plugin_page(plugin_id):
 
 @plugin_bp.route('/images/<plugin_id>/<path:filename>')
 def image(plugin_id, filename):
-    # Resolve plugins directory dynamically
-    plugins_dir = resolve_path("plugins")
+    from plugins.plugin_registry import get_plugin_search_paths
 
-    # Construct the full path to the plugin's file
-    plugin_dir = os.path.join(plugins_dir, plugin_id)
+    for base_path in get_plugin_search_paths():
+        candidate_plugin_dir = (base_path / plugin_id).resolve()
+        if candidate_plugin_dir.is_dir():
+            safe_path = (candidate_plugin_dir / filename).resolve()
+            try:
+                safe_path.relative_to(candidate_plugin_dir)
+            except ValueError:
+                return "Invalid path", 403
 
-    # Security check to prevent directory traversal
-    safe_path = os.path.abspath(os.path.join(plugin_dir, filename))
-    if not safe_path.startswith(os.path.abspath(plugins_dir)):
-        return "Invalid path", 403
+            if not safe_path.is_file():
+                logger.error(f"File not found: {safe_path}")
+                return "File not found", 404
 
-    # Convert to absolute path for send_from_directory
-    abs_plugin_dir = os.path.abspath(plugin_dir)
+            return send_from_directory(str(candidate_plugin_dir), filename)
 
-    # Check if the directory and file exist
-    if not os.path.isdir(abs_plugin_dir):
-        logger.error(f"Plugin directory not found: {abs_plugin_dir}")
-        return "Plugin directory not found", 404
-
-    if not os.path.isfile(safe_path):
-        logger.error(f"File not found: {safe_path}")
-        return "File not found", 404
-
-    # Serve the file from the plugin directory
-    return send_from_directory(abs_plugin_dir, filename)
+    logger.error(f"Plugin directory not found for: {plugin_id}")
+    return "Plugin directory not found", 404
 
 @plugin_bp.route('/plugin_instance_image/<path:playlist_name>/<path:plugin_id>/<path:instance_name>')
 def plugin_instance_image(playlist_name, plugin_id, instance_name):

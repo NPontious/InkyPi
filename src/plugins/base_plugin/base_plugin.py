@@ -69,10 +69,23 @@ class BasePlugin:
         return self.config.get("id")
 
     def get_plugin_dir(self, path=None):
-        plugin_dir = os.path.join(PLUGINS_DIR, self.get_plugin_id())
+        from plugins.plugin_registry import get_plugin_search_paths
+
+        plugin_id = self.get_plugin_id()
+        target_dir = None
+        if plugin_id:
+            for base_path in get_plugin_search_paths():
+                candidate = base_path / plugin_id
+                if candidate.is_dir():
+                    target_dir = candidate
+                    break
+
+        if target_dir is None:
+            target_dir = Path(PLUGINS_DIR) / (plugin_id or "")
+
         if path:
-            plugin_dir = os.path.join(plugin_dir, path)
-        return plugin_dir
+            return str(target_dir / path)
+        return str(target_dir)
 
     def generate_settings_template(self):
         template_params = {"settings_template": "base_plugin/settings.html"}
