@@ -116,6 +116,11 @@ class RefreshTask:
 
                         refresh_info = refresh_action.get_refresh_info()
                         refresh_info.update({"refresh_time": current_dt.isoformat(), "image_hash": image_hash})
+                        for attr in ("remote_client_last_seen", "remote_client_battery_voltage", "remote_client_battery_percent", "remote_client_wifi_rssi", "remote_client_ip"):
+                            val = getattr(latest_refresh, attr, None)
+                            if val is not None:
+                                refresh_info[attr] = val
+
                         # check if image is the same as current image
                         if image_hash != latest_refresh.image_hash:
                             logger.info(f"Updating display. | refresh_info: {refresh_info}")

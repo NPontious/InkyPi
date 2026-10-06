@@ -52,6 +52,7 @@ def _update_telemetry(device_config):
         client_ip = raw_ip.split(",")[0].strip()
         if client_ip and client_ip != "127.0.0.1":
             refresh_info.remote_client_ip = client_ip
+            device_config.update_value("remote_client_ip", client_ip)
             updated = True
 
     if updated:
