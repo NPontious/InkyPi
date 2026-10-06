@@ -81,13 +81,14 @@ class Config:
 
     def write_config(self):
         """Updates the cached config from the model objects and writes to the config file."""
+        self.update_value("playlist_config", self.playlist_manager.to_dict())
+        self.update_value("refresh_info", self.refresh_info.to_dict())
+
         if self.declarative_mode:
             logger.debug("Declarative mode active: skipping disk write to config_file")
             return
 
         logger.debug(f"Writing device config to {self.config_file}")
-        self.update_value("playlist_config", self.playlist_manager.to_dict())
-        self.update_value("refresh_info", self.refresh_info.to_dict())
         with open(self.config_file, 'w') as outfile:
             json.dump(self.config, outfile, indent=4)
 
