@@ -73,6 +73,9 @@ def apikeys_page():
 @apikeys_bp.route('/api-keys/save', methods=['POST'])
 def save_apikeys():
     """Save API keys to .env file."""
+    if current_app.config.get("DECLARATIVE_MODE", False):
+        return jsonify({"success": False, "error": "InkyPi is running in declarative mode. Provide API keys via environmentFile (agenix)."}), 403
+
     try:
         data = request.get_json()
         entries = data.get('entries', [])

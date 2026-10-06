@@ -10,6 +10,11 @@ from utils.app_utils import resolve_path, handle_request_files, parse_form
 logger = logging.getLogger(__name__)
 playlist_bp = Blueprint("playlist", __name__)
 
+@playlist_bp.before_request
+def check_declarative_playlist():
+    if request.method in ("POST", "PUT", "DELETE") and current_app.config.get("DECLARATIVE_MODE", False):
+        return jsonify({"success": False, "error": "InkyPi is running in declarative mode. Manage playlists in configuration.nix."}), 403
+
 @playlist_bp.route('/add_plugin', methods=['POST'])
 def add_plugin():
     device_config = current_app.config['DEVICE_CONFIG']

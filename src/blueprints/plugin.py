@@ -9,6 +9,12 @@ import logging
 logger = logging.getLogger(__name__)
 plugin_bp = Blueprint("plugin", __name__)
 
+@plugin_bp.before_request
+def check_declarative_plugin():
+    if request.method in ("POST", "PUT", "DELETE") and current_app.config.get("DECLARATIVE_MODE", False):
+        if request.endpoint not in ["plugin.display_plugin_instance", "plugin.update_now"]:
+            return jsonify({"success": False, "error": "InkyPi is running in declarative mode."}), 403
+
 def _delete_plugin_instance_images(device_config, plugin_instance_obj):
     """Delete all images associated with a plugin instance."""
     # Delete the plugin instance's generated image

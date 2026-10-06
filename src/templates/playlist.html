@@ -392,10 +392,16 @@
                     <img src="{{ url_for('static', filename='icons/playlist.png') }}" alt="playlist icon" class="app-icon">
                     <h1 class="app-title">Playlists</h1>
                 </div>
-                <button class="header-button" onclick="openCreateModal()">New Playlist</button>
+                <button class="header-button" onclick="openCreateModal()" {% if is_declarative %}disabled title="Managed via NixOS"{% endif %}>New Playlist</button>
             </div>
         </div>
         <div class="separator"></div>
+
+        {% if is_declarative %}
+        <div style="background: rgba(30, 144, 255, 0.15); border-left: 4px solid #1e90ff; padding: 12px 16px; margin-bottom: 20px; border-radius: 4px;">
+            <strong>Declarative Mode Active:</strong> Playlists are managed via NixOS. Configuration on this page is read-only.
+        </div>
+        {% endif %}
 
         <!-- Playlists Container -->
         <div class="playlist-list">
@@ -488,7 +494,7 @@
                 </div>
             </form>
             <div class="buttons-container">
-                <button type="button" class="action-button" id="saveButton">Save</button>
+                <button type="button" class="action-button" id="saveButton" {% if is_declarative %}disabled title="Managed via NixOS"{% endif %}>Save</button>
                 <button type="button" class="action-button warn hidden" id="deleteButton" onclick="deletePlaylist()">Delete</button>
             </div>
         </div>
@@ -505,7 +511,7 @@
                 {% include 'refresh_settings_form.html' %}
             </form>
             <div class="buttons-container">
-                <button type="button" class="action-button" onclick="saveRefreshSettings()">Save</button>
+                <button type="button" class="action-button" onclick="saveRefreshSettings()" {% if is_declarative %}disabled title="Managed via NixOS"{% endif %}>Save</button>
             </div>
         </div>
     </div>

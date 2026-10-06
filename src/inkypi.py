@@ -100,6 +100,14 @@ app.config['REFRESH_TASK'] = refresh_task
 # Set additional parameters
 app.config['MAX_FORM_PARTS'] = 10_000
 
+app.config["DECLARATIVE_MODE"] = Config.declarative_mode
+
+@app.context_processor
+def inject_declarative_status():
+    return {
+        "is_declarative": Config.declarative_mode
+    }
+
 # Register Blueprints
 app.register_blueprint(main_bp)
 app.register_blueprint(settings_bp)

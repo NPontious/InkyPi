@@ -308,6 +308,12 @@
         </div>
         <div class="separator"></div>
 
+        {% if is_declarative %}
+        <div style="background: rgba(30, 144, 255, 0.15); border-left: 4px solid #1e90ff; padding: 12px 16px; margin-bottom: 20px; border-radius: 4px;">
+            <strong>Declarative Mode Active:</strong> Plugins are managed via NixOS. Configuration on this page is read-only.
+        </div>
+        {% endif %}
+
         <!-- Include plugin settings -->
         <form id = "settingsForm" class="settings-form" onsubmit="return false;">
             <div class="settings-container">
@@ -404,7 +410,7 @@
 
             <div class="buttons-container">
                 {% if plugin_instance %}
-                    <button type="button" onclick="handleAction('update_instance')" class="action-button">Save</button>
+                    <button type="button" onclick="handleAction('update_instance')" class="action-button" {% if is_declarative %}disabled title="Managed via NixOS"{% endif %}>Save</button>
                     <button type="button" onclick="openModal('scheduleModal')" class="action-button right">Save As...</button>
                 {% else %}
                     <button type="button" onclick="handleAction()" class="action-button left">Update Now</button>
@@ -429,7 +435,7 @@
                 {% include 'refresh_settings_form.html' %}
             </form>
             <div class="buttons-container">
-                <button type="button" onclick="saveRefreshSettings()" class="action-button">Save</button>
+                <button type="button" onclick="saveRefreshSettings()" class="action-button" {% if is_declarative %}disabled title="Managed via NixOS"{% endif %}>Save</button>
             </div>
         </div>
     </div>
@@ -460,7 +466,7 @@
 
             </form>
             <div class="buttons-container">
-                <button type="button" onclick="handleAction('add_to_playlist')" class="action-button">Save</button>
+                <button type="button" onclick="handleAction('add_to_playlist')" class="action-button" {% if is_declarative %}disabled title="Managed via NixOS"{% endif %}>Save</button>
             </div>
         </div>
     </div>

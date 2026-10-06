@@ -33,6 +33,9 @@ def settings_page():
 
 @settings_bp.route('/save_settings', methods=['POST'])
 def save_settings():
+    if current_app.config.get("DECLARATIVE_MODE", False):
+        return jsonify({"success": False, "error": "InkyPi is running in declarative mode. Modify settings in configuration.nix."}), 403
+
     device_config = current_app.config['DEVICE_CONFIG']
 
     try:
