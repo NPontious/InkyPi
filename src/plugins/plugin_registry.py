@@ -61,10 +61,9 @@ def load_plugins(plugins_config):
                 module_name = f"plugins.{plugin_id}.{plugin_id}"
                 module = importlib.import_module(module_name)
             else:
-                spec = importlib.util.spec_from_file_location(plugin_id, module_path)
-                module = importlib.util.module_from_spec(spec)
-                sys.modules[plugin_id] = module
-                spec.loader.exec_module(module)
+                # Import as a package since base_path is in sys.path
+                module_name = f"{plugin_id}.{plugin_id}"
+                module = importlib.import_module(module_name)
 
             plugin_class = getattr(module, plugin.get("class"), None)
             if plugin_class:

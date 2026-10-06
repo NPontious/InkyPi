@@ -21,8 +21,8 @@ def test_external_plugin_discovery_and_blueprints(tmp_path, monkeypatch):
     }
     (plugin_dir / "plugin-info.json").write_text(json.dumps(info))
 
-    # custom_addon.py
-    code = """
+    # api.py with a blueprint
+    api_code = """
 from flask import Blueprint
 
 bp = Blueprint("custom_addon_bp", __name__)
@@ -30,6 +30,12 @@ bp = Blueprint("custom_addon_bp", __name__)
 @bp.route("/api/custom_addon/hello")
 def hello():
     return {"status": "ok"}
+"""
+    (plugin_dir / "api.py").write_text(api_code)
+
+    # custom_addon.py importing api.py via relative import
+    code = """
+from .api import bp
 
 class CustomAddonPlugin:
     def __init__(self, config):
@@ -40,6 +46,9 @@ class CustomAddonPlugin:
         return bp
 """
     (plugin_dir / "custom_addon.py").write_text(code)
+
+    # __init__.py to make it a package
+    (plugin_dir / "__init__.py").write_text("")
 
     # Set plugin path
     monkeypatch.setenv("INKYPI_PLUGIN_PATH", str(ext_dir))
