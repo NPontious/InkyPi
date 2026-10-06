@@ -92,7 +92,7 @@
         <div class="plugins-header">
             <h2 class="plugins-title">Plugins</h2>
             <div class="plugins-controls">
-                <button class="sort-toggle" id="sortToggle" title="Reorder plugins">Sort</button>
+                <button class="sort-toggle" id="sortToggle" title="Reorder plugins" {% if is_declarative %}disabled title="Managed via NixOS"{% endif %}>Sort</button>
                 <button class="view-toggle" id="viewToggle" title="Switch view">List</button>
             </div>
         </div>

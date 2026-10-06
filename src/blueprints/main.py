@@ -45,6 +45,9 @@ def get_current_image():
 @main_bp.route('/api/plugin_order', methods=['POST'])
 def save_plugin_order():
     """Save the custom plugin order."""
+    if current_app.config.get("DECLARATIVE_MODE", False):
+        return jsonify({"success": False, "error": "InkyPi is running in declarative mode. Plugin order is managed via NixOS."}), 403
+
     device_config = current_app.config['DEVICE_CONFIG']
 
     data = request.get_json() or {}

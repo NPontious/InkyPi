@@ -495,7 +495,7 @@
             </form>
             <div class="buttons-container">
                 <button type="button" class="action-button" id="saveButton" {% if is_declarative %}disabled title="Managed via NixOS"{% endif %}>Save</button>
-                <button type="button" class="action-button warn hidden" id="deleteButton" onclick="deletePlaylist()">Delete</button>
+                <button type="button" class="action-button warn hidden" id="deleteButton" onclick="deletePlaylist()" {% if is_declarative %}disabled title="Managed via NixOS"{% endif %}>Delete</button>
             </div>
         </div>
     </div>

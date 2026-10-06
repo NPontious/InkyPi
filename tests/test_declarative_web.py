@@ -52,6 +52,11 @@ def test_declarative_mutation_rejected(declarative_app):
     assert resp.status_code == 403
     assert "declarative mode" in resp.json["error"].lower()
 
+    # Plugin order save rejected
+    resp = client.post("/api/plugin_order", json={"order": ["weather"]})
+    assert resp.status_code == 403
+    assert "declarative mode" in resp.json["error"].lower()
+
 
 def test_declarative_active_controls_allowed(declarative_app):
     client = declarative_app.test_client()

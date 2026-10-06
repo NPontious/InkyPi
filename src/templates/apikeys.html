@@ -220,7 +220,7 @@
                     <div class="apikey-row" data-existing="true">
                         <input type="text" class="apikey-key" value="{{ entry.key }}" placeholder="KEY_NAME" readonly>
                         <input type="text" class="apikey-value masked" value="{{ entry.masked }}" placeholder="(unchanged)" readonly>
-                        <button type="button" class="btn-delete" onclick="deleteRow(this)" title="Delete">×</button>
+                        <button type="button" class="btn-delete" onclick="deleteRow(this)" title="Delete" {% if is_declarative %}disabled title="Managed via NixOS"{% endif %}>×</button>
                     </div>
                     {% endfor %}
                 {% else %}
@@ -234,7 +234,7 @@
             
             <!-- Add Buttons -->
             <div class="add-buttons-grid">
-                <button type="button" class="btn-add" onclick="addRow()">
+                <button type="button" class="btn-add" onclick="addRow()" {% if is_declarative %}disabled title="Managed via NixOS"{% endif %}>
                     <span>+</span> Add API Key
                 </button>
                 <button type="button" class="btn-preset" data-key="OPEN_WEATHER_MAP_SECRET" onclick="addPreset(this)">OPEN_WEATHER_MAP_SECRET</button>
@@ -279,7 +279,7 @@
             row.innerHTML = `
                 <input type="text" class="apikey-key" value="${key}" placeholder="KEY_NAME">
                 <input type="text" class="apikey-value" value="${value}" placeholder="Enter value">
-                <button type="button" class="btn-delete" onclick="deleteRow(this)" title="Delete">×</button>
+                <button type="button" class="btn-delete" onclick="deleteRow(this)" title="Delete" {% if is_declarative %}disabled title="Managed via NixOS"{% endif %}>×</button>
             `;
             list.appendChild(row);
             
