@@ -91,7 +91,7 @@ services.hostapd = {
       ssid = "inkypi-net";
       authentication = {
         mode = "wpa2-sha1";
-        wpaPassword = "<SECURE_PASSPHRASE>";
+        wpaPassword = "Sn1J1mZPitus9hJrkp8N";
       };
       settings = {
         ignore_broadcast_ssid = 1;
