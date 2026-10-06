@@ -72,25 +72,36 @@ class Calendar(BasePlugin):
     
     def fetch_ics_events(self, calendar_urls, colors, tz, start_range, end_range):
         parsed_events = []
+        if not calendar_urls:
+            return parsed_events
+
+        default_palette = ["#3b82f6", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6", "#06b6d4", "#ec4899", "#14b8a6"]
+        if not colors:
+            colors = [default_palette[i % len(default_palette)] for i in range(len(calendar_urls))]
+        elif len(colors) < len(calendar_urls):
+            colors = list(colors) + [default_palette[i % len(default_palette)] for i in range(len(colors), len(calendar_urls))]
 
         for calendar_url, color in zip(calendar_urls, colors):
-            cal = self.fetch_calendar(calendar_url)
-            events = recurring_ical_events.of(cal).between(start_range, end_range)
-            contrast_color = self.get_contrast_color(color)
+            try:
+                cal = self.fetch_calendar(calendar_url)
+                events = recurring_ical_events.of(cal).between(start_range, end_range)
+                contrast_color = self.get_contrast_color(color)
 
-            for event in events:
-                start, end, all_day = self.parse_data_points(event, tz)
-                parsed_event = {
-                    "title": str(event.get("summary")),
-                    "start": start,
-                    "backgroundColor": color,
-                    "textColor": contrast_color,
-                    "allDay": all_day
-                }
-                if end:
-                    parsed_event['end'] = end
+                for event in events:
+                    start, end, all_day = self.parse_data_points(event, tz)
+                    parsed_event = {
+                        "title": str(event.get("summary")),
+                        "start": start,
+                        "backgroundColor": color,
+                        "textColor": contrast_color,
+                        "allDay": all_day
+                    }
+                    if end:
+                        parsed_event['end'] = end
 
-                parsed_events.append(parsed_event)
+                    parsed_events.append(parsed_event)
+            except Exception as e:
+                logger.warning(f"Failed to fetch or parse calendar '{calendar_url}': {e}")
 
         return parsed_events
     
