@@ -24,6 +24,11 @@ def change_orientation(image, orientation, inverted=False):
         angle = 0
     elif orientation == 'vertical':
         angle = 90
+    else:
+        try:
+            angle = int(orientation)
+        except (ValueError, TypeError):
+            angle = 0
 
     if inverted:
         angle = (angle + 180) % 360

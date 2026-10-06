@@ -52,6 +52,18 @@ def test_display_manager_photoframe_transformed_and_atomic(tmp_path):
     assert saved_img.size == (1200, 1600)
 
 
+def test_display_manager_photoframe_integer_orientation(tmp_path):
+    conf = DummyConfig(tmp_path)
+    conf.config["orientation"] = 0
+    dm = DisplayManager(conf)
+
+    raw_img = Image.new("RGB", (1600, 1200), color=(0, 0, 255))
+    dm.display_image(raw_img)
+
+    saved_img = Image.open(conf.current_image_file)
+    assert saved_img.size == (1600, 1200)
+
+
 def test_photoframe_display_notifies_remote_client(tmp_path, monkeypatch):
     conf = DummyConfig(tmp_path)
     conf.config["remote_client_ip"] = "10.0.0.99"
