@@ -313,10 +313,10 @@ class Playlist:
     @classmethod
     def from_dict(cls, data):
         return cls(
-            name=data["name"],
-            start_time=data["start_time"],
-            end_time=data["end_time"],
-            plugins=data["plugins"],
+            name=data.get("name", "Default"),
+            start_time=data.get("start_time", "00:00"),
+            end_time=data.get("end_time", "24:00"),
+            plugins=data.get("plugins", []),
             current_plugin_index=data.get("current_plugin_index", None)
         )
 
@@ -400,10 +400,14 @@ class PluginInstance:
 
     @classmethod
     def from_dict(cls, data):
+        plugin_id = data.get("plugin_id") or data.get("id")
+        name = data.get("name") or plugin_id
+        settings = data.get("plugin_settings") if "plugin_settings" in data else data.get("settings", {})
+        refresh = data.get("refresh") if "refresh" in data else data.get("refresh_settings", {})
         return cls(
-            plugin_id=data["plugin_id"],
-            name=data["name"],
-            settings=data["plugin_settings"],
-            refresh=data["refresh"],
+            plugin_id=plugin_id,
+            name=name,
+            settings=settings,
+            refresh=refresh,
             latest_refresh_time=data.get("latest_refresh_time"),
         )
