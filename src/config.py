@@ -52,11 +52,23 @@ class Config:
         self.playlist_manager = self.load_playlist_manager()
         self.refresh_info = self.load_refresh_info()
 
+    def _expand_env_vars(self, obj):
+        """Recursively expand environment variables in string values."""
+        if isinstance(obj, str):
+            return os.path.expandvars(obj)
+        elif isinstance(obj, dict):
+            return {k: self._expand_env_vars(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [self._expand_env_vars(elem) for elem in obj]
+        return obj
+
     def read_config(self):
         """Reads the device config JSON file and returns it as a dictionary."""
         logger.debug(f"Reading device config from {self.config_file}")
         with open(self.config_file) as f:
             config = json.load(f)
+
+        config = self._expand_env_vars(config)
 
         logger.debug("Loaded config:\n%s", json.dumps(config, indent=3))
 
