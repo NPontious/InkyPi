@@ -42,11 +42,12 @@
         "active_playlist": null
     },
     "refresh_info": {
-        "refresh_time": "2026-10-05T23:46:09.663028+00:00",
-        "image_hash": "4464eefc6dcf0aee0410c7e4a2697416bfb5b6df2197be2233880740cb1211da",
+        "refresh_time": "2026-10-06T00:02:34.824640+00:00",
+        "image_hash": "dbb6d01fb778dbba2b900716b2352cf93c32a530aa6bb407809f27c7c73513b6",
         "refresh_type": "Manual Update",
         "plugin_id": "comic",
-        "remote_client_last_seen": "2026-10-06T00:00:01.618483+00:00",
-        "remote_client_battery_percent": 100
+        "remote_client_last_seen": "2026-10-06T00:08:53.582097+00:00",
+        "remote_client_battery_percent": 74,
+        "remote_client_ip": "10.218.170.123"
     }
 }
