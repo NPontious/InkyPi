@@ -31,9 +31,11 @@ python3Packages.buildPythonApplication {
     cp -r src/* $out/lib/inkypi/
 
     cat > $out/bin/inkypi <<EOF
-    #!/bin/sh
-    export PYTHONPATH="$out/lib/inkypi:\$PYTHONPATH"
-    exec ${python3Packages.python.interpreter} $out/lib/inkypi/inkypi.py "\$@"
+    #!${python3Packages.python.interpreter}
+    import sys
+    import runpy
+    sys.path.insert(0, "$out/lib/inkypi")
+    runpy.run_path("$out/lib/inkypi/inkypi.py", run_name="__main__")
     EOF
     chmod +x $out/bin/inkypi
 
