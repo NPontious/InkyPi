@@ -35,7 +35,7 @@ from blueprints.playlist import playlist_bp
 from blueprints.apikeys import apikeys_bp
 from blueprints.photoframe import photoframe_bp
 from jinja2 import ChoiceLoader, FileSystemLoader
-from plugins.plugin_registry import load_plugins
+from plugins.plugin_registry import load_plugins, register_plugin_blueprints
 from waitress import serve
 
 
@@ -49,6 +49,7 @@ parser.add_argument('--host', type=str, default='0.0.0.0', help='Host to bind to
 parser.add_argument('--config-file', type=str, default=None, help='Path to configuration JSON file')
 parser.add_argument('--state-dir', type=str, default=None, help='Directory for runtime state and images')
 parser.add_argument('--declarative', action='store_true', help='Run in declarative read-only configuration mode')
+parser.add_argument('--plugin-path', type=str, default=None, help='Colon-separated additional plugin paths')
 args = parser.parse_args()
 
 default_port = 8080 if args.dev else 80
@@ -67,6 +68,9 @@ if args.state_dir:
 
 if args.declarative:
     Config.declarative_mode = True
+
+if args.plugin_path:
+    os.environ["INKYPI_PLUGIN_PATH"] = args.plugin_path
 
 if args.dev:
     DEV_MODE = True
@@ -103,6 +107,8 @@ app.register_blueprint(plugin_bp)
 app.register_blueprint(playlist_bp)
 app.register_blueprint(apikeys_bp)
 app.register_blueprint(photoframe_bp)
+
+register_plugin_blueprints(app)
 
 # Register opener for HEIF/HEIC images
 if register_heif_opener:
