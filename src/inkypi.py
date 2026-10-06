@@ -44,18 +44,23 @@ logger = logging.getLogger(__name__)
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='InkyPi Display Server')
 parser.add_argument('--dev', action='store_true', help='Run in development mode')
+parser.add_argument('--port', type=int, default=None, help='Port to bind to')
+parser.add_argument('--host', type=str, default='0.0.0.0', help='Host to bind to')
 args = parser.parse_args()
+
+default_port = 8080 if args.dev else 80
+env_port = int(os.environ.get("PORT", default_port))
+PORT = args.port if args.port is not None else env_port
+HOST = args.host
 
 # Set development mode settings
 if args.dev:
     Config.config_file = os.path.join(Config.BASE_DIR, "config", "device_dev.json")
     DEV_MODE = True
-    PORT = 8080
-    logger.info("Starting InkyPi in DEVELOPMENT mode on port 8080")
+    logger.info(f"Starting InkyPi in DEVELOPMENT mode on port {PORT}")
 else:
     DEV_MODE = False
-    PORT = 80
-    logger.info("Starting InkyPi in PRODUCTION mode on port 80")
+    logger.info(f"Starting InkyPi in PRODUCTION mode on port {PORT}")
 logging.getLogger('waitress.queue').setLevel(logging.ERROR)
 app = Flask(__name__)
 template_dirs = [
@@ -118,6 +123,6 @@ if __name__ == '__main__':
             except:
                 pass  # Ignore if we can't get the IP
 
-        serve(app, host="0.0.0.0", port=PORT, threads=1)
+        serve(app, host=HOST, port=PORT, threads=1)
     finally:
         refresh_task.stop()
